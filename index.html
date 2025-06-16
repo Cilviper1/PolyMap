@@ -9,29 +9,51 @@
     crossorigin=""
   />
   <!-- Make sure you put this AFTER Leaflet's CSS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-   crossorigin=""></script>
-  <style>
-    html, body {
-      margin: 0px;
-    }
-    /* Leaflet */
-    #map {
-      height: 100%;
-      width: 100%;
-      background-color: black;
-      height:100%;
-      width:100%;
-    }
-  </style>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <link rel="stylesheet" href="./style.css" />
 </head>
+
 <body>
-  <div id="map"></div>
-  <script src="map.js"></script>
+  <header>
+    <div class="header-content">
+      <h2>Choose a region to explore!</h2>
+    </div>
+  </header>
+  <button onclick="clearLocalStorage()">CAREFUL: Clear Polygons</button>
+  <button onclick="EnableCreateMode()">Create!</button>
+  <button onclick="EnableEditMode()">Edit!</button>
+  <button onclick="EnableViewMode()">View/Enjoy!</button>
   <script>
-      const MAP_HEIGHT = 3880
-      const MAP_WIDTH = 5272
-      renderMap('assets/shanai.png', MAP_HEIGHT, MAP_WIDTH)
+    function EnableErrorMode() {
+      (EditMode = true), (CreateMode = true);
+    }
   </script>
+
+  <script>
+    function clearLocalStorage() {
+      if (confirm("Delete all polygons? This cannot be undone.")) {
+        // Clear localStorage and reload the page
+        console.log("Clearing localStorage");
+        // Clear localStorage
+        localStorage.clear();
+        location.reload(); // Reload the page to reflect changes
+      }
+    }
+  </script>
+  <div id="map"></div>
+
+  <script src="map.js"></script>
+  <!-- <script>
+    image = new Image
+    image.src = 'assets/image.png'
+      const MAP_HEIGHT = image.height
+      const MAP_WIDTH = image.width
+      renderMap('assets/image.png', MAP_HEIGHT, MAP_WIDTH)
+  </script>
+  -->
 </body>

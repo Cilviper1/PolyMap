@@ -1,67 +1,231 @@
-// leaflet
-async function renderMap(imgPath, mapHeight, mapWidth) {
-  var map = L.map("map", {
+// Call renderMap after DOM is ready and polygons are loaded
+let CreateMode;
+let EditMode;
+
+window.onload = async function () {
+  imageMap = new Image();
+  imageMap.src = "assets/image.png";
+  const MAP_HEIGHT = imageMap.height;
+  const MAP_WIDTH = imageMap.width;
+
+  let polygons = [];
+  const stored = localStorage.getItem("polygons");
+  if (stored) {
+    try {
+      polygons = JSON.parse(stored);
+    } catch (err) {
+      console.error("Failed to parse stored polygons:", err);
+    }
+  }
+
+  CreateMode = true;
+  console.log("Beginning in creation mode:");
+  await renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons);
+};
+
+function EnableCreateMode() {
+  CreateMode = true;
+  EditMode = false;
+  console.log("Entering Create mode..");
+}
+function EnableEditMode() {
+  CreateMode = false;
+  EditMode = true;
+  console.log("Entering Edit mode..");
+}
+function EnableViewMode() {
+  EditMode = false;
+  CreateMode = false;
+  console.log("Entering View mode. look around!");
+}
+
+// leaflet setup and interaction logic
+async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
+  const map = L.map("map", {
     crs: L.CRS.Simple,
-    minZoom: -4,
-    maxZoom: 0,
+    minZoom: -3,
+    maxZoom: 1.75,
     zoomSnap: 0.5,
     attributionControl: false,
   });
 
-  var bounds = [
+  const bounds = [
     [0, 0],
-    [mapHeight, mapWidth],
+    [MAP_HEIGHT, MAP_WIDTH],
   ];
-  var image = L.imageOverlay(imgPath, bounds).addTo(map);
+
+  const image = L.imageOverlay(imageMap.src, bounds).addTo(map);
   map.fitBounds(bounds);
   image.getElement().style.border = "4px double white";
   image.getElement().style.boxSizing = "border-box";
 
-  // split this code out of the render method
-  const polygons = []
+  let creatingPoly = false;
 
   // for the current poly
-  let paulie
-  let points = []
+  let paulie;
+  let points = [];
+
+  // Draw any existing polygons from localStorage
+  for (const polygon of polygons) {
+    L.polygon(polygon.coords, { color: "blue" }).addTo(map);
+  }
 
   // Events
-  map.on('click', (e) => {
-    const { lat, lng } = e.latlng
-    // store in polygon
-    points.push([lat.toFixed(3), lng.toFixed(3)])
 
-    if (points.length > 2) {
-      // Clear existing polygon
-      if (paulie) {
-        paulie.removeFrom(map)
+  // LEFT-CLICK: Start or extend a new polygon
+  map.on("click", (e) => {
+    console.log(e.latlng);
+    let clickedInside = false;
+
+    if (CreateMode) {
+      if (clickedInside) return;
+
+      if (points.length < 1) {
+        console.log("Begun polygon creation.");
+        creatingPoly = true;
       }
-      // Attempt to render polygon
-      paulie = L.polygon(points, { color: 'blue' })
-      paulie.addTo(map)
+
+      const { lat, lng } = e.latlng;
+      points.push([lat.toFixed(3), lng.toFixed(3)]);
+      console.log("polygon points: ", points.length);
+
+      if (points.length > 2) {
+        if (paulie) paulie.removeFrom(map);
+        paulie = L.polygon(points, { color: "green" }).addTo(map);
+      }
+    } else {
+      //console.log("Create mode is disabled.");
+      if (!EditMode && !CreateMode) {
+        //enter the code to pull the area data
+        for (const polygon of polygons) {
+          const polyLayer = L.polygon(polygon.coords);
+          if (polyLayer.getBounds().contains(e.latlng)) {
+            console.log(`You clicked on: ${polygon.name}`);
+
+            break;
+          }
+          console.log(
+            "You don't seem to have clicked on anything. Keep looking around!"
+          );
+        }
+        return;
+      }
     }
-  })
+  });
 
-  // on 'right click'
-  map.on('contextmenu', () => {
-    // Don't add invalid entries; polygons must have at least 3 points
-    if (points.length < 2) {
-      return
+  //ESC Key
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      savePoints();
     }
-    // take our existing polygon and save it to localstorage for now 
-    polygons.push(points)
-    localStorage.setItem("polygons", JSON.stringify(polygons))
+  });
 
-    // clear our memory and allow for a new polygon to be added
-    points = []
-    paulie = undefined
-  })
-
-  const existingPolys = localStorage.getItem("polygons")
-  if (existingPolys) {
-    const polygons = JSON.parse(existingPolys)
-    for (const polygon of polygons) {
-      L.polygon(polygon, { color: 'blue' }).addTo(map)
+  //transformed map.on right clight to save a polygon to be an independant function so it can be called by other events.
+  function savePoints() {
+    if (points.length >= 3) {
+      const response = prompt("What would you like to name this polygon?");
+      if (response) {
+        console.log(response);
+        polygons.push({ name: response, coords: points });
+        console.log("Polygon created");
+        paulie.setStyle({ fillColor: "blue", color: "blue" });
+        localStorage.setItem("polygons", JSON.stringify(polygons));
+      } else {
+        if (paulie) paulie.removeFrom(map);
+      }
+      creatingPoly = false;
+      points = [];
+      paulie = undefined;
     }
   }
+
+  // RIGHT-CLICK: Delete existing polygon or complete the current polygon creation
+  map.on("contextmenu", (e) => {
+    //Code for CREATE Mode
+    const clickedLatLng = e.latlng;
+    if (CreateMode) {
+      if (EditMode) {
+        console.log(
+          "Error. Should be one or the other. Disabling Edit Mode. Please try again."
+        );
+        EditMode = false;
+        return;
+      }
+      if (!creatingPoly) {
+        let polygonDeleted = false;
+
+        // Find and delete the polygon that was right-clicked
+        for (let i = 0; i < polygons.length; i++) {
+          const polygon = polygons[i];
+          if (L.polygon(polygon.coords).getBounds().contains(clickedLatLng)) {
+            if (confirm(`Are you sure you want to delete ${polygon.name}?`)) {
+              polygons.splice(i, 1);
+              localStorage.setItem("polygons", JSON.stringify(polygons));
+              console.log(`${polygon.name} deleted`);
+
+              // Remove all existing polygon layers from the map
+              map.eachLayer((layer) => {
+                if (layer instanceof L.Polygon) {
+                  map.removeLayer(layer);
+                }
+              });
+
+              polygonDeleted = true;
+            }
+
+            break; // Exit loop after handling the clicked polygon
+          }
+        }
+
+        // Redraw polygons only if one was deleted
+        if (polygonDeleted) {
+          for (const poly of polygons) {
+            L.polygon(poly.coords, { color: "blue" }).addTo(map);
+          }
+        }
+
+        return;
+      }
+      if (points.length >= 3) {
+        savePoints();
+      }
+      // Finalize and save new polygon
+    }
+    if (EditMode) {
+      for (let i = 0; i < polygons.length; i++) {
+        const polygon = polygons[i];
+        if (L.polygon(polygon.coords).getBounds().contains(clickedLatLng)) {
+          let response = prompt(
+            `What would you like to rename ${polygon.name} this as?`
+          );
+          if (response) {
+            polygons[i].name = response;
+            localStorage.setItem("polygons", JSON.stringify(polygons));
+
+            // Optionally, redraw polygons to reflect changes
+            map.eachLayer((layer) => {
+              if (layer instanceof L.Polygon) {
+                map.removeLayer(layer);
+              }
+            });
+            for (const poly of polygons) {
+              L.polygon(poly.coords, { color: "blue" }).addTo(map);
+            }
+            break;
+          }
+        }
+      }
+    }
+  });
 }
 
+/* FEATURE REQUESTS:
+-high:  DONE  Cursor want to not be a hand
+-low:   DONE  Escape key also stops polygon creation
+-low:         Hover-over for 0.52 seconds, give small text box of name/descritpion
+-med:   DONE  click on polygon, return name
+-high:  DONE  Create create/edit/view mode -> create - creeate new polygons | Edit - change existing polygon | view - click on poly to immediately get information
+-med          add sidebar to summarize data - Like matteo's Pyre website 
+-low          Layer management - locations in ocean, locations in land, etc. eg. City in kingdom
+-low:         highlight poly on hover. only for testing and fun/experience, not for final use.
+*/
