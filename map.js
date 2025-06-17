@@ -1,3 +1,72 @@
+// PAGE ELEMENTS
+const popup = document.querySelector(".popup-overlay");
+const closeBtn = document.querySelector(".close-btn");
+const gridWrapper = document.getElementById("grid-wrapper");
+const sidebarContainer = document.querySelector(".sidebar-container");
+const sidebarContent = document.querySelector(".sidebar-content");
+
+async function loadPlaceInfo() {
+  const res = await fetch("./assets/localStorageBackup.json");
+  return res.json();
+}
+
+// Click Handler
+function getInfo(info) {
+  clear();
+  sidepanel("open");
+  const Header = document.createElement("h3");
+  Header.innerHTML = info.place;
+  sidebarContent.appendChild(Header);
+
+  if (info.leader != undefined) {
+    const Leader = document.createElement("h4");
+    Leader.innerHTML = info.leader;
+    sidebarContent.appendChild(Leader);
+  }
+
+  const Content = document.createElement("p");
+  Content.innerHTML = info.description;
+  sidebarContent.appendChild(Content);
+}
+
+// Info sidepanel
+let isSidepanelClosed = true;
+
+function clear() {
+  sidebarContent.innerHTML = "";
+}
+
+closeBtn.addEventListener("click", () => {
+  if (isSidepanelClosed) {
+    sidepanel("open");
+  } else {
+    sidepanel("close");
+  }
+});
+
+function sidepanel(action) {
+  if (action === "open") {
+    if (!isSidepanelClosed) {
+      return;
+    }
+    closeBtn.textContent = ">";
+    closeBtn.style.transform = "translateX(-48px)";
+    gridWrapper.style.gridTemplateColumns = "1fr 350px";
+    sidebarContainer.style.padding = "48px 24px";
+    isSidepanelClosed = false;
+  } else if (action === "close") {
+    if (isSidepanelClosed) {
+      return;
+    }
+    closeBtn.textContent = "<";
+    closeBtn.style.transform = "translateX(-24px)";
+    gridWrapper.style.gridTemplateColumns = "1fr 0px";
+    sidebarContainer.style.padding = "48px 0";
+    isSidepanelClosed = true;
+  }
+  return;
+}
+
 // Call renderMap after DOM is ready and polygons are loaded
 let CreateMode;
 let EditMode;
@@ -41,6 +110,7 @@ function EnableViewMode() {
 
 // leaflet setup and interaction logic
 async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
+  const placesInfo = await loadPlaceInfo();
   const map = L.map("map", {
     crs: L.CRS.Simple,
     minZoom: -3,
@@ -54,20 +124,25 @@ async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
     [MAP_HEIGHT, MAP_WIDTH],
   ];
 
+  //Generate the Map
   const image = L.imageOverlay(imageMap.src, bounds).addTo(map);
   map.fitBounds(bounds);
   image.getElement().style.border = "4px double white";
-  image.getElement().style.boxSizing = "border-box";
+  image.getElement().style.boxSiz;
 
+  // for the current polying = "border-box";
   let creatingPoly = false;
-
-  // for the current poly
   let paulie;
   let points = [];
 
   // Draw any existing polygons from localStorage
   for (const polygon of polygons) {
-    L.polygon(polygon.coords, { color: "blue" }).addTo(map);
+    L.polygon(polygon.coords, {
+      color: "",
+      fillColor: "",
+      fillOpacity: 0,
+      stroke: false,
+    }).addTo(map);
   }
 
   // Events
@@ -94,19 +169,18 @@ async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
         paulie = L.polygon(points, { color: "green" }).addTo(map);
       }
     } else {
-      //console.log("Create mode is disabled.");
       if (!EditMode && !CreateMode) {
-        //enter the code to pull the area data
+        //ENTER CODE HERE to pull the area data
         for (const polygon of polygons) {
           const polyLayer = L.polygon(polygon.coords);
           if (polyLayer.getBounds().contains(e.latlng)) {
             console.log(`You clicked on: ${polygon.name}`);
-
             break;
+          } else {
+            console.log(
+              "You don't seem to have clicked on anything. Keep looking around!"
+            );
           }
-          console.log(
-            "You don't seem to have clicked on anything. Keep looking around!"
-          );
         }
         return;
       }
@@ -120,7 +194,7 @@ async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
     }
   });
 
-  //transformed map.on right clight to save a polygon to be an independant function so it can be called by other events.
+  //Take created polygon and save it to array.
   function savePoints() {
     if (points.length >= 3) {
       const response = prompt("What would you like to name this polygon?");
@@ -198,6 +272,7 @@ async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
       if (points.length >= 3) {
         savePoints();
       }
+
       // Finalize and save new polygon
     }
     if (EditMode) {
@@ -235,6 +310,7 @@ async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
   });
 }
 
+//Take the current localstorage and download it to the PC. Must move to VS Code folder to see it on next load.
 function saveToLocalStorage() {
   const data = {};
 
@@ -266,6 +342,7 @@ function saveToLocalStorage() {
   URL.revokeObjectURL(url);
 }
 
+//Funtion to load the saved file from folder storage to localstorage
 async function loadToLocalStorage() {
   const res = await fetch("./assets/localStorageBackup.json");
   const data = await res.json();
@@ -278,6 +355,7 @@ async function loadToLocalStorage() {
   window.location.reload();
   console.log("localStorage restored from JSON.");
 }
+
 /* FEATURE REQUESTS:
 -high:  DONE  Cursor want to not be a hand
 -low:   DONE  Escape key also stops polygon creation

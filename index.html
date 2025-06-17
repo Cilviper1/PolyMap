@@ -9,6 +9,7 @@
     crossorigin=""
   />
   <!-- Make sure you put this AFTER Leaflet's CSS -->
+  <!---->
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
@@ -20,17 +21,35 @@
 
 <body>
   <header>
+    
     <div class="header-content">
       <h2>Choose a region to explore!</h2>
     </div>
   </header>
+
   <button onclick="clearLocalStorage()">CAREFUL: Clear Polygons</button>
   <button onclick="EnableCreateMode()">Create!</button>
   <button onclick="EnableEditMode()">Edit!</button>
   <button onclick="EnableViewMode()">View/Enjoy!</button>
   <button onclick="saveToLocalStorage()">Save</button>
-
   <button onclick="loadToLocalStorage()">Load</button>
+
+    <main>
+      <div id="grid-wrapper"> 
+        <!-- Map element -->
+          <div class="map-container">
+            <div id="map"></div>
+          </div>
+        <!-- Side Panel -->
+        <div class="sidebar-container">
+          <h4 class="close-btn">✕</h4>
+          <div class="sidebar-content">
+            <p class="placeholder">
+              <em>Click a place on the map to begin exploring!</em>
+            </p>
+          </div>
+        </div>
+      </div>
 
   <script>
     function EnableErrorMode() {
