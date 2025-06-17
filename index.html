@@ -15,7 +15,7 @@
     crossorigin=""
   ></script>
 
-  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./assets/style.css" />
 </head>
 
 <body>
@@ -28,6 +28,10 @@
   <button onclick="EnableCreateMode()">Create!</button>
   <button onclick="EnableEditMode()">Edit!</button>
   <button onclick="EnableViewMode()">View/Enjoy!</button>
+  <button onclick="saveToLocalStorage()">Save</button>
+
+  <button onclick="loadToLocalStorage()">Load</button>
+
   <script>
     function EnableErrorMode() {
       (EditMode = true), (CreateMode = true);
@@ -48,12 +52,4 @@
   <div id="map"></div>
 
   <script src="map.js"></script>
-  <!-- <script>
-    image = new Image
-    image.src = 'assets/image.png'
-      const MAP_HEIGHT = image.height
-      const MAP_WIDTH = image.width
-      renderMap('assets/image.png', MAP_HEIGHT, MAP_WIDTH)
-  </script>
-  -->
 </body>

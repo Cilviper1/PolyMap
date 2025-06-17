@@ -124,7 +124,16 @@ async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
   function savePoints() {
     if (points.length >= 3) {
       const response = prompt("What would you like to name this polygon?");
+
       if (response) {
+        //Check if response = name of any other polygon
+        if (polygons.some((poly) => poly.name === response)) {
+          alert(
+            "A polygon with that name already exists. Please choose a different name."
+          );
+          return;
+        }
+
         console.log(response);
         polygons.push({ name: response, coords: points });
         console.log("Polygon created");
@@ -199,6 +208,13 @@ async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
             `What would you like to rename ${polygon.name} this as?`
           );
           if (response) {
+            //Check if response = name of any other polygon
+            if (polygons.some((poly) => poly.name === response)) {
+              alert(
+                "A polygon with that name already exists. Please choose a different name."
+              );
+              return;
+            }
             polygons[i].name = response;
             localStorage.setItem("polygons", JSON.stringify(polygons));
 
@@ -219,6 +235,49 @@ async function renderMap(imageMap, MAP_HEIGHT, MAP_WIDTH, polygons) {
   });
 }
 
+function saveToLocalStorage() {
+  const data = {};
+
+  // Extract all keys and parse values
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const value = localStorage.getItem(key);
+    try {
+      data[key] = JSON.parse(value);
+    } catch {
+      data[key] = value; // Fallback for plain strings
+    }
+  }
+
+  // Create JSON blob
+  const jsonData = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonData], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  // Create and trigger download link
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "localStorageBackup.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // Revoke object URL to free memory
+  URL.revokeObjectURL(url);
+}
+
+async function loadToLocalStorage() {
+  const res = await fetch("./assets/localStorageBackup.json");
+  const data = await res.json();
+
+  localStorage.clear();
+
+  for (const key in data) {
+    localStorage.setItem(key, JSON.stringify(data[key]));
+  }
+  window.location.reload();
+  console.log("localStorage restored from JSON.");
+}
 /* FEATURE REQUESTS:
 -high:  DONE  Cursor want to not be a hand
 -low:   DONE  Escape key also stops polygon creation

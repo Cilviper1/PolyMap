@@ -1,0 +1,373 @@
+body {
+  margin: 0px;
+  background-color: rgb(79, 115, 119);
+  color: rgb(255, 255, 255);
+  height: 100vh;
+}
+
+main {
+  height: 100%;
+}
+
+h2 {
+  font-family: "IM Fell English", serif;
+  font-style: italic;
+  font-size: 2rem;
+}
+
+/* Change cursor when mousing over clickable layer */
+/*
+.leaflet-clickable {
+  cursor: url(Cusor-Map-Highlight.png) 4 12, crosshair;
+}
+*/
+/* Change cursor when over entire map */
+.leaflet-container {
+  cursor: url(CusorMapReg2.png) 4 12, crosshair;
+}
+
+/* Change cursor when mousing over clickable layer */
+.leaflet-interactive {
+  cursor: url(CusorMapHighlight.png) 4 12, crosshair;
+}
+
+.leaflet-container.crosshair-cursor-enabled {
+  cursor: crosshair;
+}
+
+.map-select-container:hover {
+  cursor: help;
+}
+
+/* Landing */
+#select-world-container {
+  margin: 64px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#select-world-container h2 {
+  margin-bottom: 48px;
+}
+
+#select-world {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.map-select-container {
+  position: relative;
+  opacity: 70%;
+  border: 2px rgb(223, 223, 223) double;
+  transition: all ease-in-out 200ms;
+}
+
+.map-select-container:last-child {
+  margin-left: 24px;
+}
+
+.map-select-container:hover {
+  opacity: 100%;
+  cursor: pointer;
+}
+
+.map-select-container img {
+  width: 1200px;
+  height: auto;
+}
+
+.select-nameplate {
+  color: white;
+  transition: all ease-in-out 200ms;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "IM Fell English", serif;
+  font-size: 3rem;
+  font-style: italic;
+  width: 100%;
+  height: 100%;
+  background: #0000004d;
+  /* 30% opacity */
+}
+
+/* end landing */
+
+.wrapper-home {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  justify-content: center;
+}
+
+header {
+  display: flex;
+  background-color: #162d35;
+  background-image: url("./images/WorldMapDark_Empty_opacity10.png");
+  background-repeat: no-repeat;
+  background-size: 175rem;
+  background-position: center;
+  height: 70px;
+  border-bottom: 2px solid #6a706a;
+  align-items: center;
+}
+
+.header-content {
+  display: flex;
+  margin-right: auto;
+  margin-left: auto;
+  width: 1180px;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  margin: 0;
+  font-family: "IM Fell English", serif;
+  font-size: 80px;
+  font-style: italic;
+  font-weight: lighter;
+}
+
+.title1 {
+  vertical-align: -10px;
+  font-family: "IM Fell English", serif;
+  font-size: 100px;
+  font-style: italic;
+  font-weight: lighter;
+}
+
+.nav-menu {
+  display: flex;
+  padding: 0;
+}
+
+.nav-item {
+  list-style: none;
+  font-family: "Metamorphous", cursive;
+  border: transparent;
+  color: white;
+  background-color: transparent;
+  margin: 0 70px;
+  padding: 10px 0 0 0;
+  font-size: 18px;
+  border-bottom: 4px solid transparent;
+}
+
+.nav-item:hover {
+  list-style: none;
+  font-family: "Metamorphous", cursive;
+  margin: 0 70px;
+  font-size: 18px;
+  cursor: pointer;
+  border-bottom: 4px solid #b67c00;
+}
+
+h1 a {
+  text-decoration: none;
+  color: white;
+}
+
+li a {
+  text-decoration: none;
+  color: white;
+}
+
+h3 {
+  font-family: "Metamorphous", cursive;
+  color: #b67c00;
+  font-size: 1.3em;
+  margin-bottom: 5px;
+}
+
+h4 {
+  font-family: "Metamorphous", cursive;
+  color: white;
+  font-size: 1.1em;
+  margin-top: 12px;
+}
+
+p {
+  font-family: "Overlock", sans-serif;
+  font-size: 1.2em;
+}
+
+footer {
+  display: flex;
+  background-color: #161b16;
+  background-image: url("./images/WorldMapDark_Empty_opacity10.png");
+  background-repeat: no-repeat;
+  background-size: 150rem;
+  background-position: right;
+  height: 100px;
+  border-top: 2px solid #6a706a;
+  align-items: center;
+}
+
+.map-container {
+  height: 100%;
+  display: flex;
+  justify-content: left;
+}
+
+.img-container {
+  height: 100%;
+}
+
+/* Sidebar */
+.sidebar-container {
+  background-color: #222222;
+  padding: 80px 25px 0 25px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.close-btn {
+  font-family: sans-serif;
+  text-align: right;
+  color: rgb(160, 160, 160);
+  cursor: pointer;
+  margin: 0 0 0 0;
+  font-size: 1.6em;
+}
+
+.close-btn:hover {
+  font-family: sans-serif;
+  text-align: right;
+  color: white;
+  cursor: pointer;
+}
+
+.placeholder {
+  padding-top: 60%;
+  text-align: center;
+}
+
+@media only screen and (min-width: 1520px) {
+  .wrapper-home {
+    flex-direction: column;
+    grid-template-columns: 1fr 500px;
+  }
+}
+
+@media only screen and (max-width: 1280px) {
+  .sidebar-container {
+    padding: 80px 15px 0 15px;
+  }
+
+  p {
+    font-size: 1.1em;
+  }
+
+  h3 {
+    font-size: 1.1em;
+  }
+
+  h4 {
+    font-size: 0.9em;
+  }
+}
+
+@media only screen and (max-width: 1080px) {
+  .sidebar-container {
+    padding: 60px 15px 0 15px;
+  }
+
+  header {
+    height: 120px;
+    background-size: 125rem;
+  }
+
+  footer {
+    height: 75px;
+    background-size: 125rem;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .wrapper-home {
+    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-rows: 2fr;
+  }
+
+  header {
+    height: 100px;
+    background-size: 115rem;
+  }
+
+  .title {
+    font-size: 65px;
+  }
+
+  footer {
+    height: 75px;
+    background-size: 115rem;
+  }
+
+  .sidebar-container {
+    padding: 20px 50px 45px 50px;
+  }
+
+  .placeholder {
+    padding-top: 0px;
+  }
+}
+
+@media only screen and (max-width: 720px) {
+  .sidebar-container {
+    padding: 15px 30px 45px 30px;
+  }
+}
+
+@media only screen and (max-width: 550px) {
+  .sidebar-container {
+    padding: 15px 15px 45px 15px;
+  }
+
+  header {
+    height: 80px;
+    background-size: 70rem;
+  }
+
+  .title {
+    font-size: 45px;
+  }
+
+  .nav-item {
+    font-size: 15px;
+    margin: 0 40px;
+  }
+
+  .nav-item:hover {
+    font-size: 16px;
+    margin: 0 40px;
+  }
+
+  footer {
+    height: 75px;
+    background-size: 70rem;
+  }
+}
+
+@media only screen and (max-width: 375px) {
+  .nav-item {
+    font-size: 15px;
+    margin: 0 25px;
+  }
+
+  .nav-item:hover {
+    font-size: 15px;
+    margin: 0 25px;
+  }
+}
+
+/* Leaflet */
+#map {
+  height: 100%;
+  width: 100%;
+  background-color: rgb(76, 113, 118);
+  height: 100%;
+  width: 100%;
+}
